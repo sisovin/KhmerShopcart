@@ -10,13 +10,17 @@ import com.peanech.khmershopcart.ui.screens.CartScreen
 import com.peanech.khmershopcart.ui.screens.CheckoutScreen
 import com.peanech.khmershopcart.ui.screens.HomeScreen
 import com.peanech.khmershopcart.ui.screens.ProductDetailScreen
+import com.peanech.khmershopcart.ui.screens.SignInScreen
+import com.peanech.khmershopcart.ui.screens.SignUpScreen
 import com.peanech.khmershopcart.ui.screens.WelcomeScreen
 
 sealed class Screen(val route: String) {
     object Welcome : Screen("welcome")
+    object SignIn : Screen("signin")
+    object SignUp : Screen("signup")
     object Home : Screen("home")
-    object ProductDetail : Screen("product/{productId}") {
-        fun createRoute(productId: String) = "product/$productId"
+    object ProductDetail : Screen("product_detail/{productId}") {
+        fun createRoute(productId: String) = "product_detail/$productId"
     }
     object Cart : Screen("cart")
     object Checkout : Screen("checkout")
@@ -30,12 +34,41 @@ fun AppNavigation() {
         composable(Screen.Welcome.route) {
             WelcomeScreen(
                 onGetStarted = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.SignIn.route) {
                         popUpTo(Screen.Welcome.route) { inclusive = true }
                     }
                 }
             )
         }
+
+        composable(Screen.SignIn.route) {
+            SignInScreen(
+                onSignInSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.SignIn.route) { inclusive = true }
+                    }
+                },
+                onNavigateToSignUp = {
+                    navController.navigate(Screen.SignUp.route)
+                }
+            )
+        }
+
+        composable(Screen.SignUp.route) {
+            SignUpScreen(
+                onSignUpSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.SignUp.route) { inclusive = true }
+                    }
+                },
+                onNavigateToSignIn = {
+                    navController.navigate(Screen.SignIn.route) {
+                        popUpTo(Screen.SignUp.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(Screen.Home.route) {
             HomeScreen(
                 onProductClick = { productId ->
